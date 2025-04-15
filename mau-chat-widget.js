@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
           z-index: 100000;
           display: block;
           overflow: hidden;
-          padding-top: 30px;
+          padding-top: 5px;
           box-sizing: border-box;
           margin: 0 auto;
         ">
