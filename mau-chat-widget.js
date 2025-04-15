@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Check if current URL is in the list of valid URLs
   const currentURL = window.location.href.split('?')[0]; // Remove query parameters
-  const shouldShowWidget = validURLs.some(url => currentURL === url || currentURL === url + '/');
-  // const shouldShowWidget = true; // For testing purposes
+  // const shouldShowWidget = validURLs.some(url => currentURL === url || currentURL === url + '/');
+  const shouldShowWidget = true; // For testing purposes
   
   // Only proceed if we're on a valid URL
   if (shouldShowWidget) {
