@@ -322,8 +322,9 @@ function initMauChatWidget() {
       window.removeEventListener('wheel', wheelEventHandler, { passive: false });
     });
     
-    // Initially close the chat window to defer iframe loading
-    closeChat();
+    // Load iframe when widget initializes but maintain the original behavior
+    // of having the chat open by default
+    loadIframe();
   }
 }
 
