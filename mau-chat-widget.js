@@ -100,7 +100,7 @@ function initMauChatWidget() {
           border-radius: 8px;
           box-shadow: 0 5px 15px rgba(0,0,0,0.3);
           z-index: 100000;
-          display: block;
+          display: block; /* Explicitly set to block to ensure visibility */
           overflow: hidden;
           padding-top: 5px;
           box-sizing: border-box;
@@ -212,10 +212,14 @@ function initMauChatWidget() {
     const chatIframeContainer = document.getElementById('chat-iframe-container');
     
     // Set chat as initially opened
-    let chatOpened = true;
+    let chatOpened = true; // Keep this true for initial state
     let welcomeMessageTimer = null;
     let wheelEventHandler = null;
     let iframeLoaded = false;
+    
+    // Ensure chat is visible initially
+    chatPopoverWidget.style.display = 'block';
+    chatBubbleButton.style.display = 'none';
     
     // Function to load the iframe
     function loadIframe() {
@@ -328,13 +332,13 @@ function initMauChatWidget() {
   }
 }
 
-// Use a deferred loading approach instead of DOMContentLoaded
+  // Use a deferred loading approach instead of DOMContentLoaded
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
   // If the page is already loaded, run the function with a slight delay
-  setTimeout(initMauChatWidget, 2000); // 2 seconds delay for better page speed
+  setTimeout(initMauChatWidget, 100); // Reduced delay to ensure chat opens quickly
 } else {
-  // Else wait for the page to load and then run with a delay
+  // Else wait for the page to load and then run with minimal delay
   window.addEventListener('load', function() {
-    setTimeout(initMauChatWidget, 2000); // 2 seconds delay after load
+    setTimeout(initMauChatWidget, 100); // Reduced delay to ensure chat opens quickly
   });
 }
