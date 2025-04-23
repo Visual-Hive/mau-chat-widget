@@ -1,5 +1,6 @@
 // MAU Chat Widget - External Script
-document.addEventListener('DOMContentLoaded', function() {
+// Change from DOMContentLoaded to a more deferred approach
+function initMauChatWidget() {
   // List of URLs where the chat widget should appear
   const validURLs = [
     'https://mauvegas.com/why-attend',
@@ -130,13 +131,8 @@ document.addEventListener('DOMContentLoaded', function() {
           X
         </button>
 
-        <!-- Iframe -->
-        <iframe
-            id="chat-iframe"
-            src="https://clarion-mau-assistant.visualhive.co"
-            style="width: 100%; height: calc(100% - 20px); border: none;"
-            title="Clarion MAU Assistant Chat">
-        </iframe>
+        <!-- Lazy load the iframe -->
+        <div id="chat-iframe-container" style="width: 100%; height: calc(100% - 20px);"></div>
       </div>
     `;
     
@@ -213,11 +209,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatPopoverWidget = document.getElementById('chat-popover-widget');
     const closeChatButton = document.getElementById('close-chat-widget-button');
     const welcomePopover = document.getElementById('welcome-popover');
+    const chatIframeContainer = document.getElementById('chat-iframe-container');
     
     // Set chat as initially opened
     let chatOpened = true;
     let welcomeMessageTimer = null;
     let wheelEventHandler = null;
+    let iframeLoaded = false;
+    
+    // Function to load the iframe
+    function loadIframe() {
+      if (!iframeLoaded) {
+        const iframe = document.createElement('iframe');
+        iframe.id = 'chat-iframe';
+        iframe.src = 'https://clarion-mau-assistant.visualhive.co';
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.border = 'none';
+        iframe.title = 'Clarion MAU Assistant Chat';
+        
+        chatIframeContainer.appendChild(iframe);
+        iframeLoaded = true;
+      }
+    }
     
     // Function to show welcome message
     function showWelcomeMessage() {
@@ -243,6 +257,9 @@ document.addEventListener('DOMContentLoaded', function() {
       chatBubbleButton.style.display = 'none';
       welcomePopover.style.display = 'none';
       chatOpened = true;
+      
+      // Load iframe when chat is opened
+      loadIframe();
       
       // Clear welcome message timer when chat is opened
       if (welcomeMessageTimer) {
@@ -304,5 +321,19 @@ document.addEventListener('DOMContentLoaded', function() {
       // Remove the wheel event handler
       window.removeEventListener('wheel', wheelEventHandler, { passive: false });
     });
+    
+    // Initially close the chat window to defer iframe loading
+    closeChat();
   }
-});
+}
+
+// Use a deferred loading approach instead of DOMContentLoaded
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  // If the page is already loaded, run the function with a slight delay
+  setTimeout(initMauChatWidget, 2000); // 2 seconds delay for better page speed
+} else {
+  // Else wait for the page to load and then run with a delay
+  window.addEventListener('load', function() {
+    setTimeout(initMauChatWidget, 2000); // 2 seconds delay after load
+  });
+}
