@@ -1,5 +1,5 @@
 // MAU Chat Widget - External Script
-// Change from DOMContentLoaded to a more deferred approach
+// Use deferred loading but open the chat right after initialization
 function initMauChatWidget() {
   // List of URLs where the chat widget should appear
   const validURLs = [
@@ -100,7 +100,7 @@ function initMauChatWidget() {
           border-radius: 8px;
           box-shadow: 0 5px 15px rgba(0,0,0,0.3);
           z-index: 100000;
-          display: block; /* Explicitly set to block to ensure visibility */
+          display: none; /* Initially hidden, will be shown after initialization */
           overflow: hidden;
           padding-top: 5px;
           box-sizing: border-box;
@@ -131,7 +131,7 @@ function initMauChatWidget() {
           X
         </button>
 
-        <!-- Lazy load the iframe -->
+        <!-- Lazy load the iframe container -->
         <div id="chat-iframe-container" style="width: 100%; height: calc(100% - 20px);"></div>
       </div>
     `;
@@ -211,15 +211,10 @@ function initMauChatWidget() {
     const welcomePopover = document.getElementById('welcome-popover');
     const chatIframeContainer = document.getElementById('chat-iframe-container');
     
-    // Set chat as initially opened
-    let chatOpened = true; // Keep this true for initial state
+    let chatOpened = false; // Start with chat closed
     let welcomeMessageTimer = null;
     let wheelEventHandler = null;
     let iframeLoaded = false;
-    
-    // Ensure chat is visible initially
-    chatPopoverWidget.style.display = 'block';
-    chatBubbleButton.style.display = 'none';
     
     // Function to load the iframe
     function loadIframe() {
@@ -326,19 +321,24 @@ function initMauChatWidget() {
       window.removeEventListener('wheel', wheelEventHandler, { passive: false });
     });
     
-    // Load iframe when widget initializes but maintain the original behavior
-    // of having the chat open by default
-    loadIframe();
+    // Check for auto-open flag (set in loader.js)
+    if (window.mauChatAutoOpen) {
+      // Slight delay to ensure everything is ready
+      setTimeout(openChat, 500);
+    } else {
+      // Default to the bubble if not auto-opening
+      closeChat();
+    }
   }
 }
 
-  // Use a deferred loading approach instead of DOMContentLoaded
+// Use a deferred loading approach instead of DOMContentLoaded
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
   // If the page is already loaded, run the function with a slight delay
-  setTimeout(initMauChatWidget, 100); // Reduced delay to ensure chat opens quickly
+  setTimeout(initMauChatWidget, 1000); // 1 second delay for better page speed
 } else {
-  // Else wait for the page to load and then run with minimal delay
+  // Else wait for the page to load and then run with a delay
   window.addEventListener('load', function() {
-    setTimeout(initMauChatWidget, 100); // Reduced delay to ensure chat opens quickly
+    setTimeout(initMauChatWidget, 1000); // 1 second delay after load
   });
 }
