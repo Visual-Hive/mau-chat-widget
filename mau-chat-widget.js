@@ -93,7 +93,7 @@ function initMauChatWidget() {
           bottom: 40px;
           right: 10px;
           width: calc(100% - 20px);
-          max-width: 500px;
+          max-width: 400px;
           height: 500px;
           background-color: white;
           border: 1px solid #ccc;
