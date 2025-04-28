@@ -321,8 +321,9 @@ function initMauChatWidget() {
       window.removeEventListener('wheel', wheelEventHandler, { passive: false });
     });
     
-    // Check for auto-open flag (set in loader.js)
-    if (window.mauChatAutoOpen) {
+    // Auto-open based on window width (900px or larger)
+    // and consider the mauChatAutoOpen flag if it exists
+    if ((window.mauChatAutoOpen || window.mauChatAutoOpen === undefined) && window.innerWidth >= 900) {
       // Slight delay to ensure everything is ready
       setTimeout(openChat, 500);
     } else {
