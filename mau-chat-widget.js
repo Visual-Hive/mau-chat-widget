@@ -72,7 +72,7 @@ function initMauChatWidget() {
           font-family: Arial, sans-serif;
           font-size: 14px;
         ">
-        <p style="margin: 0; padding: 0;">Why is MAU right for me?</p>
+        <p style="margin: 0; padding: 0;">Ask a question about MAU</p>
         <!-- Triangle pointer on the right side -->
         <div style="
             position: absolute;
