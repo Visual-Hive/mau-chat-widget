@@ -1,5 +1,5 @@
 // MAU Chat Widget - External Script
-// Use deferred loading but open the chat right after initialization
+// Use deferred loading but persist user preferences
 function initMauChatWidget() {
   // List of URLs where the chat widget should appear
   const validURLs = [
@@ -211,7 +211,10 @@ function initMauChatWidget() {
     const welcomePopover = document.getElementById('welcome-popover');
     const chatIframeContainer = document.getElementById('chat-iframe-container');
     
-    let chatOpened = false; // Start with chat closed
+    // Get saved chat state from localStorage
+    const savedChatState = localStorage.getItem('mauChatState');
+    let chatOpened = savedChatState === null || savedChatState === 'open'; // Default to open if no saved state
+    
     let welcomeMessageTimer = null;
     let wheelEventHandler = null;
     let iframeLoaded = false;
@@ -234,20 +237,24 @@ function initMauChatWidget() {
     
     // Function to show welcome message
     function showWelcomeMessage() {
-      if (!chatOpened && chatBubbleButton.style.display !== 'none') {
+      // Only show welcome message if widget is closed and not explicitly set to 'closed' in localStorage
+      if (!chatOpened && chatBubbleButton.style.display !== 'none' && savedChatState !== 'closed') {
         welcomePopover.style.display = 'block';
       }
     }
     
     // Function to start welcome message timer
     function startWelcomeMessageTimer() {
-      // Clear any existing timer first
-      if (welcomeMessageTimer) {
-        clearTimeout(welcomeMessageTimer);
+      // Only start welcome timer if the widget isn't explicitly closed by user
+      if (savedChatState !== 'closed') {
+        // Clear any existing timer first
+        if (welcomeMessageTimer) {
+          clearTimeout(welcomeMessageTimer);
+        }
+        
+        // Set new timer
+        welcomeMessageTimer = setTimeout(showWelcomeMessage, 10000); // 10 seconds
       }
-      
-      // Set new timer
-      welcomeMessageTimer = setTimeout(showWelcomeMessage, 10000); // 10 seconds
     }
     
     // Function to open chat
@@ -256,6 +263,9 @@ function initMauChatWidget() {
       chatBubbleButton.style.display = 'none';
       welcomePopover.style.display = 'none';
       chatOpened = true;
+      
+      // Save state to localStorage
+      localStorage.setItem('mauChatState', 'open');
       
       // Load iframe when chat is opened
       loadIframe();
@@ -273,12 +283,19 @@ function initMauChatWidget() {
       chatBubbleButton.style.display = 'flex';
       chatOpened = false;
       
-      // Start welcome message timer when chat is closed
-      startWelcomeMessageTimer();
+      // Save state to localStorage
+      localStorage.setItem('mauChatState', 'closed');
+      
+      // Don't start welcome message timer when chat is explicitly closed by user
+      // This prevents welcome message from showing after user closes the chat
     }
 
     // Event listener for chat bubble button
-    chatBubbleButton.addEventListener('click', openChat);
+    chatBubbleButton.addEventListener('click', function() {
+      openChat();
+      // Also reset the closed state when user reopens chat
+      localStorage.removeItem('mauChatClosed');
+    });
 
     // Event listener for close button
     closeChatButton.addEventListener('click', closeChat);
@@ -321,10 +338,12 @@ function initMauChatWidget() {
       window.removeEventListener('wheel', wheelEventHandler, { passive: false });
     });
     
-    // Auto-open based on window width (900px or larger)
-    // and consider the mauChatAutoOpen flag if it exists
-    if ((window.mauChatAutoOpen || window.mauChatAutoOpen === undefined) && window.innerWidth >= 900) {
-      // Slight delay to ensure everything is ready
+    // Initialize state based on saved preference
+    if (savedChatState === 'closed') {
+      // If user previously closed the chat, show the button
+      closeChat();
+    } else if ((window.mauChatAutoOpen || window.mauChatAutoOpen === undefined) && window.innerWidth >= 900) {
+      // Auto-open based on window width (900px or larger) only if user didn't close it before
       setTimeout(openChat, 500);
     } else {
       // Default to the bubble if not auto-opening
