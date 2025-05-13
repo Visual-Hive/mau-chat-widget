@@ -237,24 +237,22 @@ function initMauChatWidget() {
     
     // Function to show welcome message
     function showWelcomeMessage() {
-      // Only show welcome message if widget is closed and not explicitly set to 'closed' in localStorage
-      if (!chatOpened && chatBubbleButton.style.display !== 'none' && savedChatState !== 'closed') {
+      // Only show welcome message if widget is closed (bubble is visible)
+      if (!chatOpened && chatBubbleButton.style.display !== 'none') {
         welcomePopover.style.display = 'block';
       }
     }
     
     // Function to start welcome message timer
     function startWelcomeMessageTimer() {
-      // Only start welcome timer if the widget isn't explicitly closed by user
-      if (savedChatState !== 'closed') {
-        // Clear any existing timer first
-        if (welcomeMessageTimer) {
-          clearTimeout(welcomeMessageTimer);
-        }
-        
-        // Set new timer
-        welcomeMessageTimer = setTimeout(showWelcomeMessage, 10000); // 10 seconds
+      // Always start welcome timer regardless of chat state
+      // Clear any existing timer first
+      if (welcomeMessageTimer) {
+        clearTimeout(welcomeMessageTimer);
       }
+      
+      // Set new timer
+      welcomeMessageTimer = setTimeout(showWelcomeMessage, 10000); // 10 seconds
     }
     
     // Function to open chat
@@ -286,8 +284,8 @@ function initMauChatWidget() {
       // Save state to localStorage
       localStorage.setItem('mauChatState', 'closed');
       
-      // Don't start welcome message timer when chat is explicitly closed by user
-      // This prevents welcome message from showing after user closes the chat
+      // Start welcome message timer when chat is closed
+      startWelcomeMessageTimer();
     }
 
     // Event listener for chat bubble button
